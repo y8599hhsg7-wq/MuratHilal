@@ -1,0 +1,241 @@
+<!doctype html>
+
+<html lang="tr">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <title>Seni seviyorum, Hilalim</title>
+
+
+
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Inter:wght@300;600;800&display=swap" rel="stylesheet">
+
+
+
+  <style>
+
+    :root{
+
+      --bg1: #ff9a9e;
+
+      --bg2: #fecfef;
+
+      --accent: #ff2d95;
+
+      --card: rgba(255,255,255,0.85);
+
+    }
+
+    *{box-sizing:border-box}
+
+    html,body{height:100%}
+
+    body{
+
+      margin:0;
+
+      font-family:"Inter",system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
+
+      background:linear-gradient(135deg,var(--bg1),var(--bg2));
+
+      display:flex;
+
+      align-items:center;
+
+      justify-content:center;
+
+      color:#2b2130;
+
+      -webkit-font-smoothing:antialiased;
+
+    }
+
+    .card{
+
+      background:var(--card);
+
+      border-radius:18px;
+
+      box-shadow:0 10px 30px rgba(43,33,48,0.18);
+
+      padding:clamp(28px,4vw,64px);
+
+      text-align:center;
+
+      position:relative;
+
+      overflow:hidden;
+
+    }
+
+    h1{
+
+      margin:0 0 8px 0;
+
+      font-family:"Great Vibes",cursive;
+
+      font-size:clamp(48px,10vw,120px);
+
+      line-height:0.88;
+
+      letter-spacing:0.02em;
+
+      color:#4a142f;
+
+      text-shadow:0 6px 18px rgba(74,20,47,0.18);
+
+    }
+
+    p.lead{
+
+      margin:0;
+
+      font-size:clamp(14px,1.9vw,18px);
+
+      color:#362433;
+
+      opacity:0.9;
+
+    }
+
+    canvas{
+
+      position:absolute;
+
+      left:0;top:0;
+
+      width:100%;height:100%;
+
+      pointer-events:none;
+
+    }
+
+  </style>
+
+</head>
+
+<body>
+
+  <main class="card">
+
+    <canvas id="hearts"></canvas>
+
+    <h1>Seni seviyorum,<br>Hilalim ❤️</h1>
+
+    <p class="lead">Kalbimin en güzel köşesinde sen varsın 🌙</p>
+
+  </main>
+
+
+
+  <script>
+
+    const c = document.getElementById('hearts');
+
+    const ctx = c.getContext('2d');
+
+    let w = c.width = innerWidth;
+
+    let h = c.height = innerHeight;
+
+    window.addEventListener('resize', ()=>{w=c.width=innerWidth;h=c.height=innerHeight;});
+
+    const hearts=[];
+
+    function Heart(x,y,vx,vy,size,color){this.x=x;this.y=y;this.vx=vx;this.vy=vy;this.size=size;this.color=color;this.life=0;}
+
+    Heart.prototype.update=function(){this.x+=this.vx;this.y+=this.vy;this.vy+=0.02;this.life++;}
+
+    Heart.prototype.draw=function(ctx){
+
+      ctx.save();
+
+      ctx.translate(this.x,this.y);
+
+      ctx.beginPath();
+
+      const s=this.size;
+
+      ctx.moveTo(0,-s/2);
+
+      ctx.bezierCurveTo(s/2,-s*1.1,s*1.2,-s/3,0,s);
+
+      ctx.bezierCurveTo(-s*1.2,-s/3,-s/2,-s*1.1,0,-s/2);
+
+      ctx.closePath();
+
+      ctx.fillStyle=this.color;
+
+      ctx.shadowColor=this.color;
+
+      ctx.shadowBlur=8;
+
+      ctx.fill();
+
+      ctx.restore();
+
+    }
+
+    function spawnHeart(x,y){
+
+      const a=(Math.random()*Math.PI/2)-Math.PI/4;
+
+      const sp=1.4+Math.random()*1.6;
+
+      const vx=Math.cos(a)*sp;
+
+      const vy=Math.sin(a)*sp-2.5;
+
+      const size=6+Math.random()*28;
+
+      const colors=['#ff2d95','#ff5aa5','#ff7ab0','#ff8fbf','#ffc0de'];
+
+      const color=colors[Math.floor(Math.random()*colors.length)];
+
+      hearts.push(new Heart(x,y,vx,vy,size,color));
+
+    }
+
+    function burst(n=20){
+
+      const rect=document.querySelector('.card').getBoundingClientRect();
+
+      const cx=rect.left+rect.width/2;
+
+      const cy=rect.top+rect.height/2;
+
+      for(let i=0;i<n;i++)spawnHeart(cx+(Math.random()-0.5)*200,cy+(Math.random()-0.5)*80);
+
+    }
+
+    function loop(){
+
+      ctx.clearRect(0,0,w,h);
+
+      for(let i=hearts.length-1;i>=0;i--){
+
+        const p=hearts[i];
+
+        p.update();p.draw(ctx);
+
+        if(p.y>h||p.life>240)hearts.splice(i,1);
+
+      }
+
+      requestAnimationFrame(loop);
+
+    }
+
+    loop(); burst(25);
+
+    setInterval(()=>burst(8),3000);
+
+  </script>
+
+</body>
+
+</html>
